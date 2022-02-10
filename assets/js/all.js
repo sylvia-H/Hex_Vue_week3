@@ -1,0 +1,248 @@
+"use strict";
+
+var baseUrl = 'https://vue3-course-api.hexschool.io/v2';
+var API_PATH = 'sylviah';
+var AUTH_TOKEN = document.cookie.replace(/(?:(?:^|.*;\s*)myToken\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+"use strict";
+
+var app = {
+  data: function data() {
+    return {
+      userInfo: {
+        username: '',
+        password: ''
+      }
+    };
+  },
+  methods: {
+    loginIn: function loginIn() {
+      axios.post("".concat(baseUrl, "/admin/signin"), this.userInfo).then(function (res) {
+        var _res$data = res.data,
+            token = _res$data.token,
+            expired = _res$data.expired; // 用 cookie 儲存資料，myToken 是自定義名稱
+
+        document.cookie = "myToken=".concat(token, "; expires=").concat(new Date(expired), ";");
+        window.location = './backend.html';
+      })["catch"](function (err) {
+        console.log(err.response);
+        var errTitle = err.response.data.message;
+        var errMSG = err.response.data.error.message; //登入失敗，sweetalert 跳出提示訊息視窗
+
+        swal("".concat(errTitle, "\uFF01"), errMSG, {
+          icon: "error"
+        });
+      });
+    }
+  }
+}; // 建立實體、掛載
+
+Vue.createApp(app).mount('#app');
+"use strict";
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var editModal = '';
+var delModal = '';
+var app2 = {
+  data: function data() {
+    return {
+      products: [],
+      tempItemInfo: {
+        imagesUrl: []
+      },
+      // 是否新增新產品，預設狀態:"0-否"
+      is_addNewProduct: 0,
+      is_uploadImg: 0,
+      uploadImgFile: {
+        imageUrl: '',
+        message: ''
+      }
+    };
+  },
+  methods: {
+    checkLogin: function checkLogin() {
+      var _this = this;
+
+      AUTH_TOKEN = document.cookie.replace(/(?:(?:^|.*;\s*)myToken\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+      axios.post("".concat(baseUrl, "/api/user/check")).then(function () {
+        _this.getProducts();
+      })["catch"](function (err) {
+        console.log(err.response);
+        window.location = './index.html';
+      });
+    },
+    getProducts: function getProducts() {
+      var _this2 = this;
+
+      axios.get("".concat(baseUrl, "/api/").concat(API_PATH, "/admin/products")).then(function (res) {
+        console.log(res.data.products);
+        _this2.products = res.data.products;
+      })["catch"](function (err) {
+        console.log(err.response);
+      });
+    },
+    changeStatus: function changeStatus(id) {
+      var _this3 = this;
+
+      this.products.forEach(function (item) {
+        if (item.id === id) {
+          item.is_enabled ? item.is_enabled = 0 : item.is_enabled = 1;
+          console.log(item);
+
+          _this3.editProduct(item, id);
+        }
+      });
+    },
+    openEditModal: function openEditModal(item) {
+      this.tempItemInfo = {
+        imagesUrl: []
+      };
+
+      if (item) {
+        this.tempItemInfo = _objectSpread(_objectSpread({}, item), {}, {
+          imagesUrl: _toConsumableArray(item.imagesUrl)
+        });
+      }
+
+      editModal.show();
+    },
+    openDelModal: function openDelModal(item) {
+      this.tempItemInfo = _objectSpread({}, item);
+      delModal.show();
+    },
+    uploadProductImg: function uploadProductImg() {
+      var _this4 = this;
+
+      // 圖片上傳中
+      this.is_uploadImg = 1; //清空預設
+
+      this.uploadImgFile = {
+        imageUrl: '',
+        message: ''
+      };
+      var btn_uploadImg = document.querySelector('#btn_uploadImg');
+      var file = btn_uploadImg.files[0];
+      console.dir(file); // 先對 input 內容進行觀察
+
+      var formData = new FormData(); //建立表單格式的物件
+      // 對應平台 API 格式：<input type="file" name="file-to-upload">
+
+      formData.append('file-to-upload', file);
+      axios.post("".concat(baseUrl, "/api/").concat(API_PATH, "/admin/upload"), formData).then(function (res) {
+        console.log(res.data.imageUrl);
+        _this4.uploadImgFile.imageUrl = res.data.imageUrl; // 圖片上傳完成
+
+        _this4.is_uploadImg = 0;
+      })["catch"](function (err) {
+        console.log(err.response.message);
+        _this4.uploadImgFile.message = err.response.message; // 圖片上傳失敗，重設狀態
+
+        _this4.is_uploadImg = 0;
+      });
+    },
+    copyText: function copyText() {
+      var clipboard = new ClipboardJS('#btn_copyLink');
+      clipboard.on('success', function (e) {
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        e.clearSelection(); //取消選取
+      });
+      clipboard.on('error', function (e) {
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+      });
+    },
+    editProduct: function editProduct(item, id) {
+      var _this5 = this;
+
+      if (item) {
+        this.tempItemInfo = item;
+      }
+
+      var dataObj = {
+        "data": this.tempItemInfo
+      };
+      var httpStatus = '';
+      var url = '';
+
+      if (this.is_addNewProduct) {
+        httpStatus = 'post';
+        url = "".concat(baseUrl, "/api/").concat(API_PATH, "/admin/product");
+      } else {
+        httpStatus = 'put';
+        url = "".concat(baseUrl, "/api/").concat(API_PATH, "/admin/product/").concat(this.tempItemInfo.id || id);
+      }
+
+      axios[httpStatus](url, dataObj).then(function (res) {
+        console.log(res.data);
+
+        _this5.getProducts();
+      })["catch"](function (err) {
+        console.log(err.response);
+      }); // 清空上傳圖片區
+
+      this.uploadImgFile = {
+        imageUrl: '',
+        message: ''
+      }; // 關閉 modal
+
+      editModal.hide();
+    },
+    delProduct: function delProduct() {
+      var _this6 = this;
+
+      var dataID = this.tempItemInfo.id;
+      axios["delete"]("".concat(baseUrl, "/api/").concat(API_PATH, "/admin/product/").concat(dataID)).then(function (res) {
+        console.log(res.data);
+
+        _this6.getProducts();
+      })["catch"](function (err) {
+        console.log(err.response);
+      });
+      delModal.hide();
+    }
+  },
+  mounted: function mounted() {
+    this.checkLogin();
+    editModal = new bootstrap.Modal(document.querySelector('#productModal'));
+    delModal = new bootstrap.Modal(document.querySelector('#delProductModal'));
+  }
+}; // 建立實體、掛載
+
+Vue.createApp(app2).mount('#app2'); // {
+//     "title": "[賣]動物園造型衣服3",
+//     "category": "衣服2",
+//     "origin_price": 100,
+//     "price": 300,
+//     "unit": "個",
+//     "description": "Sit down please 名設計師設計",
+//     "content": "這是內容",
+//     "is_enabled": 1,
+//     "imageUrl": "主圖網址",
+//     "imagesUrl": [
+//       "圖片網址一",
+//       "圖片網址二",
+//       "圖片網址三",
+//       "圖片網址四",
+//       "圖片網址五"
+//     ]
+// }
+//# sourceMappingURL=all.js.map
