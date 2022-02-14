@@ -194,9 +194,25 @@ var app2 = {
       axios[httpStatus](url, dataObj).then(function (res) {
         console.log(res.data);
 
+        if (httpStatus === 'post') {
+          //成功新增產品，sweetalert 跳出提示訊息視窗
+          swal('成功！', "\u6210\u529F\u65B0\u589E ".concat(_this5.tempItemInfo.title), {
+            icon: "success"
+          });
+        } else {
+          //成功更新產品，sweetalert 跳出提示訊息視窗
+          swal('成功！', "\u5DF2\u66F4\u65B0 ".concat(_this5.tempItemInfo.title, " \u7684\u8CC7\u8A0A"), {
+            icon: "success"
+          });
+        }
+
         _this5.getProducts();
       })["catch"](function (err) {
-        console.log(err.response);
+        console.log(err.response); //更新失敗，sweetalert 跳出提示訊息視窗
+
+        swal('失敗！', '請再試一次', {
+          icon: "error"
+        });
       }); // 清空上傳圖片區
 
       this.uploadImgFile = {
@@ -211,11 +227,19 @@ var app2 = {
 
       var dataID = this.tempItemInfo.id;
       axios["delete"]("".concat(baseUrl, "/api/").concat(API_PATH, "/admin/product/").concat(dataID)).then(function (res) {
-        console.log(res.data);
+        console.log(res.data); //成功刪除產品，sweetalert 跳出提示訊息視窗
+
+        swal('成功！', "\u5DF2\u522A\u9664 ".concat(_this6.tempItemInfo.title, " \u7684\u8CC7\u8A0A"), {
+          icon: "success"
+        });
 
         _this6.getProducts();
       })["catch"](function (err) {
-        console.log(err.response);
+        console.log(err.response); //刪除失敗，sweetalert 跳出提示訊息視窗
+
+        swal('失敗！', '請再試一次', {
+          icon: "error"
+        });
       });
       delModal.hide();
     }
