@@ -144,10 +144,25 @@ const app2 = {
             axios[httpStatus](url, dataObj)
             .then(res => {
                 console.log(res.data);
+                if(httpStatus === 'post'){
+                    //成功新增產品，sweetalert 跳出提示訊息視窗
+                    swal('成功！', `成功新增 ${this.tempItemInfo.title}`, {
+                        icon: "success",
+                    });
+                } else {
+                    //成功更新產品，sweetalert 跳出提示訊息視窗
+                    swal('成功！', `已更新 ${this.tempItemInfo.title} 的資訊`, {
+                        icon: "success",
+                    });
+                }
                 this.getProducts();
             })
             .catch(err => {
                 console.log(err.response);
+                //更新失敗，sweetalert 跳出提示訊息視窗
+                swal('失敗！', '請再試一次', {
+                    icon: "error",
+                });
             });
 
             // 清空上傳圖片區
@@ -165,10 +180,18 @@ const app2 = {
             axios.delete(`${baseUrl}/api/${API_PATH}/admin/product/${dataID}`)
             .then(res => {
                 console.log(res.data);
+                //成功刪除產品，sweetalert 跳出提示訊息視窗
+                swal('成功！', `已刪除 ${this.tempItemInfo.title} 的資訊`, {
+                    icon: "success",
+                });
                 this.getProducts();
             })
             .catch(err => {
                 console.log(err.response);
+                //刪除失敗，sweetalert 跳出提示訊息視窗
+                swal('失敗！', '請再試一次', {
+                    icon: "error",
+                });
             });
 
             delModal.hide();
