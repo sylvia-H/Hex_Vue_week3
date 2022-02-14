@@ -208,9 +208,14 @@ var app2 = {
 
         _this5.getProducts();
       })["catch"](function (err) {
-        console.log(err.response); //更新失敗，sweetalert 跳出提示訊息視窗
+        console.log(err.response);
+        var errMSG = err.response.data.message;
+        var msg = '';
+        errMSG.forEach(function (el) {
+          return msg += el + '。\n';
+        }); //更新失敗，sweetalert 跳出提示訊息視窗
 
-        swal('失敗！', '請再試一次', {
+        swal('失敗！請重新輸入資訊。', msg, {
           icon: "error"
         });
       }); // 清空上傳圖片區
