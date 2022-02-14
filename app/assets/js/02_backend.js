@@ -159,8 +159,11 @@ const app2 = {
             })
             .catch(err => {
                 console.log(err.response);
+                const errMSG = err.response.data.message;
+                let msg = '';
+                errMSG.forEach(el => msg+=el+'。\n')
                 //更新失敗，sweetalert 跳出提示訊息視窗
-                swal('失敗！', '請再試一次', {
+                swal('失敗！請重新輸入資訊。', msg, {
                     icon: "error",
                 });
             });
