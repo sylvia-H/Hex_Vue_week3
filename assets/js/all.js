@@ -105,6 +105,10 @@ var app2 = {
 
       if (item) {
         this.tempItemInfo = _objectSpread({}, item);
+
+        if (!this.tempItemInfo.imagesUrl) {
+          this.tempItemInfo.imagesUrl = [];
+        }
       }
 
       editModal.show();
