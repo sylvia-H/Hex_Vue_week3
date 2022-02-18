@@ -56,10 +56,7 @@ const app2 = {
 
             if(item) {
                 this.tempItemInfo = {
-                    ...item,
-                    imagesUrl:[
-                        ...item.imagesUrl
-                    ]
+                    ...item
                 };
             }
         
