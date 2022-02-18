@@ -58,6 +58,9 @@ const app2 = {
                 this.tempItemInfo = {
                     ...item
                 };
+                if(!this.tempItemInfo.imagesUrl){
+                    this.tempItemInfo.imagesUrl = []
+                }
             }
         
             editModal.show();
