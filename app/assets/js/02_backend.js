@@ -59,9 +59,6 @@ const app2 = {
                 // this.tempItemInfo = {
                 //     ...item
                 // };
-                // if(!this.tempItemInfo.imagesUrl){
-                //     this.tempItemInfo.imagesUrl = []
-                // }
                 this.tempItemInfo = JSON.parse(JSON.stringify(item));
 
                 if(!this.tempItemInfo.imagesUrl) {
