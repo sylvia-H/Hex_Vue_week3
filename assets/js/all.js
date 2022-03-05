@@ -104,7 +104,14 @@ var app2 = {
       };
 
       if (item) {
-        this.tempItemInfo = _objectSpread({}, item);
+        // 以下舊寫法易發生傳參考問題，應改成深拷貝
+        // this.tempItemInfo = {
+        //     ...item
+        // };
+        // if(!this.tempItemInfo.imagesUrl){
+        //     this.tempItemInfo.imagesUrl = []
+        // }
+        this.tempItemInfo = JSON.parse(JSON.stringify(item));
 
         if (!this.tempItemInfo.imagesUrl) {
           this.tempItemInfo.imagesUrl = [];
